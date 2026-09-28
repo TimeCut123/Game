@@ -341,42 +341,6 @@ function text(str, x, y, size, col, weight = '600') {
   ctx.fillStyle = col; ctx.fillText(str, x, y);
 }
 
-// Clawd: a little pixel crab who dances on the menu and game-over screens
-const CLAWD = [
-  '.XXXXXXXXX.',
-  '.XXEXXXEXX.',
-  '.XXXXXXXXX.',
-  '.XXXXXXXXX.',
-  '.XXXXXXXXX.',
-];
-function drawClawd(x, y, px) {
-  const beat = t * 4, b = Math.floor(beat) % 2, hop = Math.abs(Math.sin(beat * Math.PI)) * px * 2.5;
-  ctx.save();
-  ctx.translate(x, y - hop);
-  ctx.rotate(Math.sin(beat * Math.PI / 2) * 0.18);
-  ctx.translate(-5.5 * px, -3.5 * px);
-  CLAWD.forEach((row, r) => [...row].forEach((c, k) => {
-    if (c === '.') return;
-    ctx.fillStyle = c === 'E' ? '#1a1a1a' : '#d97757';
-    ctx.fillRect(k * px, r * px, px + 0.5, px + 0.5);
-  }));
-  ctx.fillStyle = '#d97757';
-  // Arms wave in turn
-  ctx.fillRect(0, (b ? 0 : 2) * px, px, px * 2);
-  ctx.fillRect(10 * px, (b ? 2 : 0) * px, px, px * 2);
-  // Legs step in turn
-  [2, 4, 6, 8].forEach((k, i) => ctx.fillRect(k * px, 5 * px, px, px * ((i + b) % 2 ? 1 : 2)));
-  ctx.restore();
-  // Music notes
-  ctx.textAlign = 'center';
-  for (let i = 0; i < 2; i++) {
-    const ph = (t * 0.8 + i * 0.5) % 1, side = i ? 1 : -1;
-    ctx.globalAlpha = 1 - ph;
-    text(i ? '\u266B' : '\u266A', x + side * (px * 8 + ph * px * 3), y - px * 3 - ph * px * 8, px * 4, '#ffd76a', '700');
-  }
-  ctx.globalAlpha = 1;
-}
-
 function drawUI() {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const s = Math.min(1, innerWidth / 560), cx = innerWidth / 2, cy = offY + H * scale / 2;
@@ -413,7 +377,6 @@ function drawUI() {
     text('Purple shards shatter nearby echoes. Skim past echoes for bonus points.', cx, cy + 70 * s, 14 * s, 'rgba(210,215,255,0.65)', '400');
     text('Move: WASD / arrows, or drag anywhere', cx, cy + 96 * s, 14 * s, 'rgba(210,215,255,0.65)', '400');
     if (Math.floor(t * 2) % 2 === 0) text(`${tap} to begin`, cx, cy + 150 * s, 20 * s, '#fff', '700');
-    drawClawd(cx, cy + 220 * s, 7 * s);
   } else if (state === 'pause') {
     text('PAUSED', cx, cy - 10, 48 * s, '#fff', '900');
     text(`${tap} to resume`, cx, cy + 36 * s, 18 * s, '#dfe4ff', '500');
@@ -424,7 +387,6 @@ function drawUI() {
     text(deathInfo.newBest ? 'NEW BEST!' : `best ${best}`, cx, cy + 42 * s, 16 * s, deathInfo.newBest ? '#ffd76a' : 'rgba(210,215,255,0.7)', '700');
     text(`${orbs} orbs · ${grazes} close calls · ${deathInfo.time}s survived`, cx, cy + 78 * s, 15 * s, 'rgba(210,215,255,0.7)', '400');
     if (performance.now() - deadAt > 700 && Math.floor(t * 2) % 2 === 0) text(`${tap} to try again`, cx, cy + 130 * s, 20 * s, '#fff', '700');
-    if (deathInfo.newBest) drawClawd(cx, cy + 195 * s, 6 * s);
   }
 }
 
